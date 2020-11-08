@@ -1,0 +1,10 @@
+@import "styles/default";
+@import "styles/variables";
+@import "styles/mixins";
+
+#app {
+  color: $primary-color;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}

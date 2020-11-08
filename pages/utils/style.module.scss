@@ -1,0 +1,45 @@
+.home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  background: #7b6967;
+  $bs-rgba: rgba(0, 0, 0, 0.04);
+  $greyish-brown: #6e6661;
+  $light-grey: #e5e4dd;
+  $tungsten: #302d2c;
+  $magnesium: #c1b9b6;
+  $brownish-grey: #7b6967;
+
+  .title {
+    box-shadow: 0 1px 15px $bs-rgba, 0 1px 6px $bs-rgba;
+    border-radius: 1.25rem;
+    background: $greyish-brown;
+    border: solid 0.01px $greyish-brown;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 55%;
+    margin-top: 8rem;
+    height: 2.8rem;
+    cursor: pointer;
+    color: whitesmoke;
+  }
+  .box {
+    position: absolute;
+    height: 8rem;
+    width: 7rem;
+    bottom: 20vh;
+    cursor: grab;
+
+    path {
+      fill: $magnesium;
+    }
+
+    &.isDragging {
+      // cursor: grabbing;
+      // z-index: 2;
+      // transition: transform 500ms ease;
+    }
+  }
+}
