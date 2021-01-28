@@ -1,0 +1,16 @@
+$green-lantern: #a1cc3a;
+$jade-gravel: #0dbbc1;
+
+:export {
+  swtach1Fill: $green-lantern;
+  swatch1Width: 9.8rem;
+  swatch1Top: 2rem;
+  swatch1Left: -0.8rem;
+  swatch1Transform: rotate(180deg);
+}
+:export {
+  swtach2Fill: $jade-gravel;
+  swatch2Width: 12rem;
+  swatch2Right: -1rem;
+  swatch2Bottom: -4vh;
+}

@@ -1,0 +1,20 @@
+.title {
+  @import "../../tools/styles";
+  @include card-styles(
+    $zIndex: 1,
+    $all-border: false,
+    $top: 7.99,
+    $width: 30%,
+    $height: 3,
+    $align-items: flex-end,
+    $background: $painted-desert
+  );
+  font-size: 1.1rem;
+  padding: 0.5rem;
+  color: $scarabaeus-sacer;
+  transition: transform 0.8s ease;
+  &.show {
+    transform: translateY(1.5rem);
+    transition: transform 0.8s ease;
+  }
+}

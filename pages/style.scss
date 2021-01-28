@@ -1,0 +1,10 @@
+@import "styles/default";
+
+#app {
+  position: relative;
+  color: whitesmoke;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100vh;
+}

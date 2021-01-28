@@ -1,0 +1,16 @@
+$lava-pit: #e07332;
+$royal-purple: #634197;
+
+:export {
+  swtach1Fill: $lava-pit;
+  swatch1Width: 9.8rem;
+  swatch1Top: 2rem;
+  swatch1Left: -0.8rem;
+  swatch1Transform: rotate(180deg);
+}
+:export {
+  swtach2Fill: $royal-purple;
+  swatch2Width: 12rem;
+  swatch2Right: -1rem;
+  swatch2Bottom: -4vh;
+}
