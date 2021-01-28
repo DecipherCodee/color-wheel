@@ -1,0 +1,5 @@
+.right {
+  @import "../../tools/styles";
+  @include nav-styles(">", unset);
+  right: 5%;
+}

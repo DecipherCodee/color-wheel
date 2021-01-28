@@ -1,0 +1,30 @@
+@import "styles/variables";
+
+$bs-rgba: rgba(0, 0, 0, 0.04);
+
+@mixin card-styles(
+  $zIndex: 2,
+  $all-border: true,
+  $top,
+  $align-items,
+  $height,
+  $width,
+  $background
+) {
+  background: $background;
+  top: #{$top}rem;
+  align-items: $align-items;
+  width: $width;
+  height: #{$height}rem;
+  position: fixed;
+  box-shadow: 0 1px 15px $bs-rgba, 0 1px 6px $bs-rgba;
+  @if $all-border {
+    border-radius: 1.25rem;
+  } @else {
+    border-bottom-right-radius: 1.25rem;
+    border-bottom-left-radius: 1.25rem;
+  }
+  z-index: $zIndex;
+  display: flex;
+  justify-content: center;
+}

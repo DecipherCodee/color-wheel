@@ -1,0 +1,27 @@
+@import "../../../styles";
+
+@mixin nav-styles($content, $align-self) {
+  @include icon-box-styles($align-self);
+
+  $x-shadow: 2;
+  $x-translate: 100;
+  @if $content == "<" {
+    $x-shadow: -2;
+    $x-translate: -100;
+  }
+  &::before {
+    content: $content;
+    margin-top: -0.2rem;
+    transform: scaleX(0.5);
+    color: $painted-desert;
+    font-size: 1rem;
+    text-shadow: #{$x-shadow}px 2px 5px rgba(0, 0, 0, 0.5);
+  }
+  z-index: 21;
+  transform: translateX(#{$x-translate}vw);
+  transition: transform 0.8s ease;
+  &.show {
+    transform: translateX(0);
+    transition: transform 0.8s ease;
+  }
+}

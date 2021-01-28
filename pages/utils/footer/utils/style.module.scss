@@ -1,0 +1,15 @@
+.footer {
+  @import "../../styles";
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  bottom: 2.8vh;
+  left: 2rem;
+  right: 2rem;
+  z-index: 100;
+
+  .settings {
+    @include icon-box-styles($align-self: flex-end);
+  }
+}

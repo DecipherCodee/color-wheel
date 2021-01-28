@@ -1,0 +1,137 @@
+.wheel {
+  @import "styles/variables";
+  cursor: grab;
+  align-self: center;
+  z-index: 101;
+  position: absolute;
+  bottom: 10%;
+  border-top-right-radius: 44%;
+  border-top-left-radius: 44%;
+  border-bottom-right-radius: 44%;
+  width: 66.4px;
+  height: 72.8px;
+  background: $painted-desert;
+  transform-origin: center;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  padding-right: 1.8rem;
+  overflow: hidden;
+  &.grab {
+    cursor: grabbing;
+  }
+  &.flip {
+    cursor: unset;
+  }
+
+  @mixin contents-styles {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    transform: rotate(180deg);
+  }
+
+  @mixin button-styles($background, $width: 7rem, $height: 3rem) {
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+    border-radius: 22px;
+    width: $width;
+    height: $height;
+    background: $background;
+    color: #c1b9b6;
+  }
+
+  .contents {
+    @include contents-styles();
+    height: 100%;
+    overflow-y: scroll;
+    &::-webkit-scrollbar {
+      display: none;
+      width: 0;
+    }
+
+    .table {
+      margin-left: -0.8rem;
+      margin-top: 4.8rem;
+      display: flex;
+      font-size: 0.8rem;
+      color: $leroy;
+
+      ul {
+        height: 100%;
+        position: relative;
+      }
+      li {
+        text-transform: capitalize;
+        padding: 0.1rem 0.4rem;
+        &:nth-of-type(1) {
+          padding-top: 0.3rem;
+        }
+      }
+
+      .colors {
+        display: flex;
+        flex-direction: column;
+
+        li {
+          border-right: solid 1px $leroy;
+          padding-right: 1.2rem;
+        }
+        header {
+          padding: 0 0.8rem;
+          padding-bottom: 0.3rem;
+          border-bottom: solid 1px $leroy;
+          border-right: solid 1px $leroy;
+        }
+        button {
+          @include button-styles(#448aa4, $width: 90%, $height: 1.6rem);
+        }
+      }
+      .time {
+        display: flex;
+        flex-direction: column;
+
+        li {
+          padding-left: 1.2rem;
+        }
+        header {
+          padding: 0 1.2rem;
+          padding-bottom: 0.3rem;
+          border-bottom: solid 1px $leroy;
+        }
+        button {
+          margin-left: 0.8rem;
+          @include button-styles(#8d1e24, $width: 100%, $height: 1.6rem);
+        }
+      }
+    }
+    button {
+      margin-top: 0.8rem;
+      margin-bottom: 2.8rem
+    }
+  }
+  .pause {
+    @include contents-styles();
+    padding-right: 1rem;
+    height: 100%;
+
+    aside {
+      margin-top: 50%;
+      display: flex;
+      margin-bottom: 2rem;
+      width: 100%;
+
+      .restart {
+        margin-right: 2rem;
+        @include button-styles(#448aa4, $width: 100%, $height: 2.8rem);
+      }
+      .continue {
+        @include button-styles(#87a260, $width: 100%, $height: 2.8rem);
+      }
+    }
+    .quit {
+      @include button-styles(#8d1e24, $height: 2.8rem);
+    }
+  }
+}

@@ -1,0 +1,19 @@
+.header {
+  @import "./tools/styles";
+  z-index: 100;
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-self: center;
+
+  .subHeader {
+    @include card-styles(
+      $top: 7.8,
+      $width: 55%,
+      $height: 2.8,
+      $align-items: center,
+      $background: $leroy
+    );
+  }
+}

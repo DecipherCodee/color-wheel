@@ -1,0 +1,16 @@
+.color {
+  position: absolute;
+  height: 2rem;
+  width: 2rem;
+  border-radius: 100%;
+  opacity: 0;
+  transform: scale(1);
+  transition: opacity 0.001s ease, transform 0.8s ease;
+  &.focus {
+    opacity: 1;
+    height: 100vh;
+    width: 100vw;
+    transform: scale(100);
+    transition: transform 1.8s ease,height 1.8s ease, width 1.8s ease;
+  }
+}

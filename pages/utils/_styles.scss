@@ -1,0 +1,35 @@
+@import "styles/variables";
+
+@mixin icon-box-styles($align-self: unset, $position: absolute) {
+  cursor: pointer;
+  align-self: $align-self;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: $position;
+  background: $leroy;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  width: 1.6rem;
+  height: 1.6rem;
+}
+@mixin slideIn-styles($x-translate, $nameOut, $nameIn) {
+  transform: translateX(#{$x-translate}vw);
+  animation: $nameOut 0.8s ease forwards;
+  @keyframes #{$nameOut} {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(#{$x-translate}vw);
+    }
+  }
+  &.show {
+    animation: $nameIn 0.8s ease forwards;
+    @keyframes #{$nameIn} {
+      100% {
+        transform: translateX(0);
+      }
+    }
+  }
+}
