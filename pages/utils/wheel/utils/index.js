@@ -19,17 +19,17 @@ let initAllFocused;
 let putFocusAll = () => {};
 let initProps;
 let putProps = () => {};
-const defaultProps = {
-  onDrag() {},
-  onFocusAll() {},
-  onGameStart() {},
-  onRestartLevel() {},
+let appWidth;
+
+export const defaultProps = {
+  onDrag: null,
+  onFocusAll: null,
+  onGameStart: null,
+  onRestartLevel: null,
   onContent() {
     return { useColorList() {}, useRecordList() {} };
   },
 };
-let appWidth;
-
 const {
   wheel,
   grab,
@@ -43,7 +43,7 @@ const {
   restart: restartButton,
   flip: flipWheel,
 } = styles;
-const variants = {
+export const variants = {
   normal: {
     scale: 1,
     boxShadow: "0px 8px 10px rgba(0, 0, 0, 0.2)",
@@ -192,6 +192,48 @@ function useContents() {
     )
   );
 }
+export function updateDragged({ isDragged, drag }) {
+  initDragged = isDragged;
+  if (drag) {
+    putDrag = drag;
+  }
+}
+export function updateQuitted({ isQuitted, quit }) {
+  initQuitted = isQuitted;
+  if (quit) {
+    putQuit = quit;
+  }
+}
+export function updateResized({ isResized, resize }) {
+  initResized = isResized;
+  if (resize) {
+    putResize = resize;
+  }
+}
+export function updateFlipped({ isFlipped, flip }) {
+  initFlipped = isFlipped;
+  if (flip) {
+    putFlip = flip;
+  }
+}
+export function updateAllFocused({ isAllFocused, focusAll }) {
+  initAllFocused = isAllFocused;
+  if (focusAll) {
+    putFocusAll = focusAll;
+  }
+}
+export function updateProps({ props, setProps }) {
+  initProps = props;
+  if (setProps) {
+    putProps = setProps;
+  }
+}
+export function onFlip({ isFlipped, onFocusAll }) {
+  if (!isFlipped) {
+    return;
+  }
+  onFocusAll();
+}
 
 export function useStore() {
   const { unmount, ref } = GStore();
@@ -199,60 +241,42 @@ export function useStore() {
   appWidth = ref.current?.clientWidth;
 
   const [isQuitted, quit] = useState(false);
-  initQuitted = isQuitted;
-  putQuit = quit;
-  useEffect(() => unmount({ set: putQuit, value: false }), [unmount]);
-  useEffect(() => {
-    initQuitted = isQuitted;
-  }, [isQuitted]);
+  updateQuitted({ isQuitted, quit });
+  useEffect(unmount.bind(null, { set: putQuit, value: false }), [unmount]);
+  useEffect(updateQuitted.bind(null, { isQuitted }), [isQuitted]);
 
   const [isResized, resize] = useState(false);
-  initResized = isResized;
-  putResize = resize;
-  useEffect(() => unmount({ set: resize, value: false }), [unmount]);
-  useEffect(() => {
-    initResized = isResized;
-  }, [isResized]);
-  useEffect(() => resizeWheel({ isResized }), [isResized]);
+  updateResized({ isResized, resize });
+  useEffect(unmount.bind(null, { set: resize, value: false }), [unmount]);
+  useEffect(updateResized.bind(null, { isResized }), [isResized]);
+  useEffect(resizeWheel.bind(null, { isResized }), [isResized]);
 
   const [isDragged, drag] = useState(true);
-  initDragged = isDragged;
-  putDrag = drag;
-  useEffect(() => unmount({ set: drag, value: true }), [unmount]);
-  useEffect(() => {
-    initDragged = isDragged;
-  }, [isDragged]);
+  updateDragged({ isDragged, drag });
+  useEffect(unmount.bind(null, { set: drag, value: true }), [unmount]);
+  useEffect(updateDragged.bind(null, { isDragged }), [isDragged]);
 
   const [isFlipped, flip] = useState(false);
-  initFlipped = isFlipped;
-  putFlip = flip;
-  useEffect(() => unmount({ set: putFlip, value: false }), [unmount]);
-  useEffect(() => {
-    initFlipped = isFlipped;
-  }, [isFlipped]);
+  updateFlipped({ isFlipped, flip });
+  useEffect(unmount.bind(null, { set: putFlip, value: false }), [unmount]);
+  useEffect(updateFlipped.bind(null, { isFlipped }), [isFlipped]);
 
   const [isAllFocused, focusAll] = useState(false);
-  initAllFocused = isAllFocused;
-  putFocusAll = focusAll;
-  useEffect(() => unmount({ set: putFocusAll, value: false }), [unmount]);
-  useEffect(() => {
-    initAllFocused = isAllFocused;
-  }, [isAllFocused]);
+  updateAllFocused({ isAllFocused, focusAll });
+  useEffect(unmount.bind(null, { set: putFocusAll, value: false }), [unmount]);
+  useEffect(updateAllFocused.bind(null, { isAllFocused }), [isAllFocused]);
 
   const [props, setProps] = useState(defaultProps);
-  initProps = props;
-  putProps = setProps;
-  useEffect(() => () => putProps(defaultProps), []);
-  useEffect(() => {
-    initProps = props;
-  }, [props]);
+  updateProps({ props, setProps });
+  useEffect(unmount.bind(null, { set: putProps, value: defaultProps }), [
+    unmount,
+  ]);
+  useEffect(updateProps.bind(null, { props }), [props]);
 
-  useEffect(() => {
-    if (!isFlipped) {
-      return;
-    }
-    initProps.onFocusAll();
-  }, [isFlipped]);
+  useEffect(onFlip.bind(null, { isFlipped, onFocusAll: props.onFocusAll }), [
+    isFlipped,
+    props.onFocusAll,
+  ]);
 
   return {
     transition,
