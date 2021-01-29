@@ -1,7 +1,1 @@
-{
-  "builds": [
-    {
-      "config": { "distDir": "build" }
-    }
-  ]
-}
+{}
