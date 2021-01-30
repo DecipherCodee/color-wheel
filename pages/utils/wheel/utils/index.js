@@ -232,7 +232,9 @@ export function onFlip({ isFlipped, onFocusAll }) {
   if (!isFlipped) {
     return;
   }
-  onFocusAll();
+  if (onFocusAll) {
+    onFocusAll();
+  }
 }
 
 export function useStore() {
