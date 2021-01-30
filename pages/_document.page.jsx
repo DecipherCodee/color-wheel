@@ -5,6 +5,8 @@ export class App extends Document {
     return (
       <Html>
         <Head>
+          <title>ColorWheel</title>
+
           <link
             defer
             async
