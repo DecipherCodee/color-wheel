@@ -13,6 +13,7 @@ export function useWheel() {
     isDragged,
     Contents,
     transition,
+    initName,
   } = useStore();
 
   return (
@@ -29,7 +30,7 @@ export function useWheel() {
       animate={animate}
       transition={transition}
     >
-      <Contents />
+      <Contents name={initName} />
     </motion.main>
   );
 }

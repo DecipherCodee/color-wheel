@@ -1,6 +1,6 @@
 import { useStore } from "./utils";
 
-export function usePause() {
+export function useSettings() {
   const { Render } = useStore();
 
   return <Render />;

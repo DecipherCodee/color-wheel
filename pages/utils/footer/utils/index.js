@@ -1,17 +1,17 @@
 import { useSVGs } from "../../../../public/svgs";
 import { usePause } from "./pause";
+import { useSettings } from "./settings";
 import styles from "./style.module.scss";
 
-const { footer, settings } = styles;
+const { footer } = styles;
 
 export function useStore() {
-  const { useSettingsIcon, useDecipherCodeLogo } = useSVGs();
+  const { useDecipherCodeLogo } = useSVGs();
 
   return {
     Pause: usePause,
     footer,
-    settings,
-    Settings: useSettingsIcon,
+    Settings: useSettings,
     DecipherCodeLogo: useDecipherCodeLogo,
   };
 }

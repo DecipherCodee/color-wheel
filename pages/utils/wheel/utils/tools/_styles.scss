@@ -1,0 +1,18 @@
+@import 'styles/variables';
+
+@mixin contents-styles {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  transform: rotate(180deg);
+}
+@mixin button-styles($background, $width: 7rem, $height: 3rem) {
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+  border-radius: 22px;
+  width: $width;
+  height: $height;
+  background: $background;
+  color: $painted-desert;
+}

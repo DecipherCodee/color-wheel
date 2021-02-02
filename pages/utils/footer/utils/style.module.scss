@@ -1,5 +1,4 @@
 .footer {
-  @import "../../styles";
   position: absolute;
   display: flex;
   flex-direction: column;
@@ -8,8 +7,4 @@
   left: 2rem;
   right: 2rem;
   z-index: 100;
-
-  .settings {
-    @include icon-box-styles($align-self: flex-end);
-  }
 }
