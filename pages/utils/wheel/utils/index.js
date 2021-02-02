@@ -1,48 +1,57 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { motion, useAnimation } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import { useGStore as GStore } from "../..";
 import { useTitleStore as TitleStore } from "../../header/utils/title/utils";
 import styles from "./style.module.scss";
 import { usePauseStore as PauseStore } from "../../footer/utils/pause/utils";
-import { useSVGs } from "../../../../public/svgs";
 
 let animate;
 let initDragged;
-let putDrag = () => {};
+let putDrag;
 let initResized;
-let putResize = () => {};
+let putResize;
 let initFlipped;
-let putFlip = () => {};
+let putFlip;
 let initQuitted;
-let putQuit = () => {};
+let putQuit;
 let initAllFocused;
-let putFocusAll = () => {};
+let putFocusAll;
 let initProps;
-let putProps = () => {};
+let putProps;
 let appWidth;
+
+export const GameOver = dynamic(() =>
+  import("./game-over").then((mod) => mod.useGameOver)
+);
+export const Paused = dynamic(() =>
+  import("./paused").then((mod) => mod.usePaused)
+);
 
 export const defaultProps = {
   onDrag: null,
   onFocusAll: null,
   onGameStart: null,
   onRestartLevel: null,
-  onContent() {
-    return { useColorList() {}, useRecordList() {} };
-  },
+  onContent: null,
 };
-const {
-  wheel,
-  grab,
-  contents,
-  table,
-  colors,
-  time,
-  pause,
-  quit: quitButton,
-  continue: start,
-  restart: restartButton,
-  flip: flipWheel,
-} = styles;
+const { wheel, grab, flip: flipWheel } = styles;
+
+export function isWidth({ initWidth }) {
+  let width;
+  let height;
+
+  if (initWidth >= 367) {
+    width = 330;
+    height = 365;
+  } else {
+    width = "80%";
+    height = "50%";
+  }
+  return { width, height };
+}
+
 export const variants = {
   normal: {
     scale: 1,
@@ -61,11 +70,13 @@ export const variants = {
     y: 0,
   },
   flipped() {
+    const { width, height } = isWidth({ initWidth: appWidth });
+
     return {
       x: 0,
       y: -60,
-      width: appWidth >= 367 ? 330 : "80%",
-      height: appWidth >= 367 ? 365 : "50%",
+      width,
+      height,
       rotateX: -180,
       rotateY: -180,
     };
@@ -78,37 +89,37 @@ const transition = {
   damping: 9,
 };
 
-function onDragStart() {
+export function isView({ initView, initStarted }) {
+  if (initView !== "home" && !initStarted) {
+    return false;
+  }
+  return true;
+}
+export function onDragStart() {
   const { initView } = GStore();
   const { initStarted } = TitleStore();
 
-  putResize(() => {
-    if (initView !== "home" && !initStarted) {
-      return false;
-    }
-    return true;
-  });
+  putResize(isView.bind(null, { initView, initStarted }));
+
   initProps.onGameStart();
 }
-function onDragEnd() {
+export function onDragEnd() {
   putResize(false);
 }
-function resizeWheel({ isResized }) {
+export function resizeWheel({ isResized }) {
   if (isResized) {
     animate.start("resized");
   } else {
     animate.start("normal");
   }
 }
-function restartGame() {
-  const { putShow: showTitle, initName } = TitleStore();
-
+export function restartGame({ initName, showTitle }) {
   if (initName !== "Practice") {
-    const { putMount: mountPause } = PauseStore();
+    const { putMount: mountPause = () => {} } = PauseStore();
     mountPause(true);
     showTitle((old) => !old);
   }
-  const { putIndex } = GStore();
+  const { putIndex = () => {} } = GStore();
 
   putIndex(0);
   initProps.onRestartLevel();
@@ -116,81 +127,41 @@ function restartGame() {
   animate.start("unflipped");
   putDrag(true);
 }
-function quitGame() {
-  const { putShow: showPause } = PauseStore();
+export function isTitle(old) {
+  if (!old) {
+    return old;
+  }
+  return false;
+}
+export function quitGame() {
+  const { putShow: showPause = () => {} } = PauseStore();
 
-  const { putIndex } = GStore();
+  const { putIndex = () => {} } = GStore();
 
   putIndex(0);
   showPause(false);
   putQuit(true);
-  const { putShow: showTitle } = TitleStore();
+  const { putShow: showTitle = () => {} } = TitleStore();
 
   initProps.onRestartLevel();
-  showTitle((old) => {
-    if (!old) {
-      return old;
-    }
-    return false;
-  });
+  showTitle(isTitle);
   putFlip(false);
   animate.start("unflipped");
   putDrag(true);
 }
-function useContents() {
-  const { useGameOverLogo: GameOver, usePauseName: PauseName } = useSVGs();
-  const { initName } = TitleStore();
-  const { onClick } = PauseStore();
-  const {
-    useRecordList: RecordList,
-    useColorList: ColorList,
-  } = initProps.onContent();
+export function isContent({ isFlipped, name }) {
+  if (isFlipped) {
+    if (name === "0:00" || name === "Practice") {
+      return <GameOver test="game-over" />;
+    }
+    return <Paused test="paused" />;
+  }
+  return null;
+}
+export function useContents({ name }) {
+  const content = isContent({ name, isFlipped: initFlipped });
 
-  return initFlipped && (initName === "0:00" || initName === "Practice") ? (
-    <main className={contents}>
-      <GameOver />
-
-      <aside className={table}>
-        <ul className={colors}>
-          <header>Color</header>
-
-          <ColorList />
-
-          <button type="button" onClick={restartGame}>
-            {initAllFocused ? "Restart" : "Try again"}
-          </button>
-        </ul>
-
-        <ul className={time}>
-          <header>Time</header>
-          <RecordList />
-
-          <button type="button" onClick={quitGame}>
-            Quit
-          </button>
-        </ul>
-      </aside>
-    </main>
-  ) : (
-    initFlipped && (initName !== "0:00" || initName !== "Practice") && (
-      <main className={pause}>
-        <PauseName />
-
-        <aside>
-          <button className={restartButton} type="button" onClick={restartGame}>
-            Restart
-          </button>
-          <button className={start} type="button" onClick={onClick}>
-            Continue
-          </button>
-        </aside>
-
-        <button className={quitButton} type="button" onClick={quitGame}>
-          Quit
-        </button>
-      </main>
-    )
-  );
+  return content;
 }
 export function updateDragged({ isDragged, drag }) {
   initDragged = isDragged;
@@ -236,6 +207,9 @@ export function onFlip({ isFlipped, onFocusAll }) {
     onFocusAll();
   }
 }
+export function useClassName({ isResized, isFlipped }) {
+  return `${wheel} ${isResized && grab} ${isFlipped && flipWheel}`;
+}
 
 export function useStore() {
   const { unmount, ref } = GStore();
@@ -280,16 +254,19 @@ export function useStore() {
     props.onFocusAll,
   ]);
 
+  const { initName } = TitleStore();
+
   return {
+    initName,
     transition,
     Contents: useContents,
     ref,
     isDragged: initDragged,
     animate,
-    className: useMemo(
-      () => `${wheel} ${isResized && grab} ${isFlipped && flipWheel}`,
-      [isFlipped, isResized]
-    ),
+    className: useMemo(useClassName.bind(null, { isFlipped, isResized }), [
+      isFlipped,
+      isResized,
+    ]),
     variants,
     motion,
     onDragStart,
@@ -312,5 +289,7 @@ export function useWheelStore() {
     putFlip,
     initQuitted,
     putQuit,
+    restartGame,
+    quitGame,
   };
 }

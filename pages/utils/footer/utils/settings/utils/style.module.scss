@@ -1,0 +1,4 @@
+.settings {
+  @import '../../../../styles';
+  @include icon-box-styles($align-self: flex-end);
+}

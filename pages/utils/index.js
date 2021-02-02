@@ -3,6 +3,7 @@
 
 import dynamic from "next/dynamic";
 import { createRef, useEffect, useState } from "react";
+import Head from "next/head";
 import { useFooter } from "./footer";
 import { useHeader } from "./header";
 import { useWheel } from "./wheel";
@@ -58,6 +59,7 @@ export function useStore() {
 }
 export function useAppStore() {
   return {
+    Head,
     Header: useHeader,
     Footer: useFooter,
     Wheel: useWheel,
