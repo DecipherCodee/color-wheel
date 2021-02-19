@@ -1,9 +1,9 @@
 import { useStore } from "./utils";
 
 export function useHome() {
-  const { View } = useStore();
+  const { home } = useStore();
 
-  return <View />;
+  return <main className={home} />;
 }
 
 export default useHome;

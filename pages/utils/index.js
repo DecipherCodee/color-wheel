@@ -1,18 +1,17 @@
-// ! Tested
-/* eslint-disable react-hooks/exhaustive-deps */
-
 import dynamic from "next/dynamic";
 import { createRef, useEffect, useState } from "react";
 import Head from "next/head";
 import { useFooter } from "./footer";
 import { useHeader } from "./header";
 import { useWheel } from "./wheel";
+import styles from "./style.module.scss";
 
 let initIndex;
 let putIndex;
 let initView;
 let putView;
 
+const { home } = styles;
 const ref = createRef();
 export const useLevels = dynamic(() =>
   import("./levels").then((mod) => mod.useLevels)
@@ -54,6 +53,7 @@ export function useStore() {
   useEffect(initialiseView.bind(null, { view }), [view]);
 
   return {
+    home,
     View: useView({ name: initView }),
   };
 }
