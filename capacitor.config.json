@@ -1,0 +1,13 @@
+{
+  "appId": "com.deciphercode.colorwheel",
+  "appName": "ColorWheel",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "out",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2
+    }
+  },
+  "cordova": {}
+}

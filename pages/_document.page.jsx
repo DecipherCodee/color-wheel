@@ -69,11 +69,9 @@ export class App extends Document {
     );
   }
 }
-
 App.getInitialProps = async (ctx) => {
   const initialProps = await Document.getInitialProps(ctx);
 
   return { ...initialProps };
 };
-
 export default App;

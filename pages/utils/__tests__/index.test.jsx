@@ -1,12 +1,10 @@
 import { shallow } from "enzyme";
 import { useHome } from "../../index.page";
 
-describe("index.page.jsx", () => {
-  it("returns", () => {
-    function Home() {
-      return useHome();
-    }
+describe("useHome", () => {
+  it("renders", () => {
+    const Home = useHome;
     const wrapper = shallow(<Home />);
-    expect(wrapper).toHaveLength(1);
+    expect(wrapper.isEmptyRender()).toBeFalsy();
   });
 });

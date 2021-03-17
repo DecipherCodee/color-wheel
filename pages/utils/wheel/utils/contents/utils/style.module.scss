@@ -1,0 +1,98 @@
+.contents {
+  @import "./tools/styles";
+  @include contents-styles();
+  overflow-y: scroll;
+  &::-webkit-scrollbar {
+    display: none;
+    width: 0;
+  }
+
+  .mainTitle {
+    font-size: 2rem;
+    letter-spacing: 6px;
+    font-family: Relaunch;
+    margin-top: 2rem;
+    margin-bottom: 1.2rem;
+    text-shadow: 2px 2px 2px #2b130bc5;
+  }
+  .practice,
+  .level {
+    color: $leroy;
+    font-size: 0.8rem;
+
+    .colors {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  .practice {
+    width: 80%;
+
+    .colors {
+      padding: 0.2rem 0;
+      border-bottom: solid 1px $leroy;
+      border-top: solid 1px $leroy;
+
+      li {
+        padding-top: 0.2rem;
+        padding-bottom: 0.2rem;
+      }
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 1.4rem;
+
+      button {
+        @include button-styles(#448aa4, $width: 40%, $height: 1.6rem);
+        &:nth-last-of-type(1) {
+          @include button-styles(#8d1e24, $width: 40%, $height: 1.6rem);
+        }
+      }
+    }
+  }
+  .level {
+    display: flex;
+    margin-left: -0.8rem;
+
+    ul {
+      height: 100%;
+      position: relative;
+    }
+    button {
+      margin-top: 0.8rem;
+      margin-bottom: 2.8rem;
+    }
+
+    .colors {
+      header {
+        padding: 0 0.8rem;
+        padding-bottom: 0.3rem;
+        border-bottom: solid 1px $leroy;
+        border-right: solid 1px $leroy;
+      }
+      li {
+        border-right: solid 1px $leroy;
+      }
+      button {
+        @include button-styles(#448aa4, $width: 90%, $height: 1.6rem);
+      }
+    }
+    .time {
+      display: flex;
+      flex-direction: column;
+
+      header {
+        padding: 0 1.2rem;
+        padding-bottom: 0.3rem;
+        border-bottom: solid 1px $leroy;
+      }
+      button {
+        margin-left: 0.8rem;
+        @include button-styles(#8d1e24, $width: 100%, $height: 1.6rem);
+      }
+    }
+  }
+}

@@ -2,7 +2,7 @@ import "./style.scss";
 import { useAppStore } from "./utils";
 
 export function useApp({ Component, pageProps }) {
-  const { Header, Footer, Wheel, ref, Head } = useAppStore();
+  const { Header, Footer, Wheel, Head, ref } = useAppStore();
 
   return (
     <main id="app" ref={ref}>
