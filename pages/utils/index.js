@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import dynamic from "next/dynamic";
 import Head from "next/head";
 import { createRef, useEffect, useMemo, useState } from "react";
