@@ -18,10 +18,10 @@
   "coverageReporters": ["json", "text", "lcov", "clover"],
   "coverageThreshold": {
     "global": {
-      "statements": 30,
-      "branches": 30,
-      "functions": 30,
-      "lines": 30
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
     }
   },
 
@@ -38,7 +38,7 @@
 
   "resetMocks": true,
   "restoreMocks": true,
-  "roots": ["<rootDir>/pages/","<rootDir>/public/svgs/"],
+  "roots": ["<rootDir>/pages/"],
   "runner": "jest-runner",
 
   "setupFilesAfterEnv": ["<rootDir>/tests/setup.js"],

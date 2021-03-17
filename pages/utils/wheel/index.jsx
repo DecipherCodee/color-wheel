@@ -2,18 +2,18 @@ import { useStore } from "./utils";
 
 export function useWheel() {
   const {
-    className,
-    motion,
-    animate,
-    variants,
     ref,
-    onDragStart,
-    onDrag,
-    onDragEnd,
+    motion,
+    variants,
+    className,
+    animation,
+    transition,
+    isFlipped,
     isDragged,
     Contents,
-    transition,
-    initName,
+    onDrag,
+    onDragStart,
+    onDragEnd,
   } = useStore();
 
   return (
@@ -27,10 +27,10 @@ export function useWheel() {
       onDragEnd={onDragEnd}
       variants={variants}
       initial="normal"
-      animate={animate}
+      animate={animation}
       transition={transition}
     >
-      <Contents name={initName} />
+      {isFlipped && <Contents />}
     </motion.main>
   );
 }

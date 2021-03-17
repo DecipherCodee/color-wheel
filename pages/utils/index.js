@@ -1,79 +1,168 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import dynamic from "next/dynamic";
-import { createRef, useEffect, useState } from "react";
 import Head from "next/head";
-import { useFooter } from "./footer";
-import { useHeader } from "./header";
-import { useWheel } from "./wheel";
+import { createRef, useEffect, useMemo, useState } from "react";
+import { useArrows } from "./arrows";
+import { useLayout } from "./layout";
+import { useProps as titleProps } from "./layout/header/utils/title/utils";
 import styles from "./style.module.scss";
+import { useProps as WheelProps } from "./wheel/utils";
 
-let initIndex;
-let putIndex;
-let initView;
-let putView;
+let initShown = true;
+let putShow;
+let initProps;
+let putProps;
 
-const { home } = styles;
+const defaultProps = { onAnimationEnd: null };
+const { home, hide } = styles;
 const ref = createRef();
-export const useLevels = dynamic(() =>
-  import("./levels").then((mod) => mod.useLevels)
+
+export const usePanel1 = dynamic(() =>
+  import("../level/1/utils/panel").then((mod) => mod.usePanel)
 );
-export const useLevel1 = dynamic(() =>
-  import("./views/level-1").then((mod) => mod.useLevel1)
+export const usePanel2 = dynamic(() =>
+  import("../level/2/utils/panel").then((mod) => mod.usePanel)
+);
+export const usePractice = dynamic(() =>
+  import("./practice").then((mod) => mod.usePractice)
 );
 
-function useView({ name }) {
-  const views = {
-    home: useLevels,
-    level1: useLevel1,
-  };
-  return views[name];
+function unmount({ set, value }) {
+  return () => set(value);
 }
-export function unmount({ set, value }) {
-  return set(value);
+
+function checkMounted({ isMounted, put }) {
+  if (!isMounted) {
+    return;
+  }
+  put(true);
 }
-export function initialiseIndex({ index, setIndex }) {
-  initIndex = index;
-  if (setIndex) {
-    putIndex = setIndex;
+export function checkIndex({ colors, color, titleStore, putColors }, old) {
+  if (!colors[color].isFocused) {
+    const index = old + 1;
+    let record;
+
+    if (titleStore) {
+      const { initName } = titleStore();
+      record = initName;
+    }
+    putColors({
+      ...colors,
+      [color]: {
+        ...colors[color],
+        index,
+        isFocused: true,
+        record,
+      },
+    });
+    return index;
+  }
+  return old;
+}
+
+function findElement({
+  clientX,
+  clientY,
+  colors,
+  putColors,
+  TitleStore,
+  putIndex,
+}) {
+  const nearestElements = document.elementsFromPoint(clientX, clientY);
+
+  if (!nearestElements.length > 0 && !Object.keys(colors).length > 0) {
+    return;
+  }
+  nearestElements.forEach((element) =>
+    Object.keys(colors).find((color) => {
+      if (element.closest(`.${color}`)) {
+        putIndex(
+          checkIndex.bind(this, {
+            colors,
+            color,
+            titleStore: TitleStore,
+            putColors,
+          })
+        );
+      }
+      return null;
+    })
+  );
+}
+
+function isAllUnfocused({ colors }) {
+  return Object.keys(colors).find((color) => !colors[color].isFocused);
+}
+
+function onAnimationEnd({ isShown, putMount }) {
+  if (isShown) {
+    return;
+  }
+  putMount(false);
+}
+
+function updateShown({ isShown, show }) {
+  if (initShown !== isShown) {
+    initShown = isShown;
+  }
+  if (show && putShow !== show) {
+    putShow = show;
   }
 }
-export function initialiseView({ view }) {
-  initView = view;
+function updateProps({ props, setProps }) {
+  if (initProps !== props) {
+    initProps = props;
+  }
+  if (setProps && putProps !== setProps) {
+    putProps = setProps;
+  }
 }
 
 export function useStore() {
-  const [index, setIndex] = useState(0);
-  initialiseIndex({ index, setIndex });
-  useEffect(unmount.bind(null, { set: putIndex, value: 0 }), []);
-  useEffect(initialiseIndex.bind(null, { index }), [index]);
+  const [isShown, show] = useState(true);
+  updateShown({ isShown, show });
+  useEffect(() => unmount({ set: putShow }), []);
+  useEffect(() => updateShown({ isShown }), [isShown]);
 
-  const [view, setView] = useState("home");
-  initView = view;
-  putView = setView;
-  useEffect(unmount.bind(null, { set: putView, value: "home" }), []);
-  useEffect(initialiseView.bind(null, { view }), [view]);
+  const [props, setProps] = useState(defaultProps);
+  updateProps({ props, setProps });
+  useEffect(() => unmount({ set: setProps }), []);
+  useEffect(() => updateProps({ props }), [props]);
+
+  useEffect(() => {
+    const { reset: resetTitle } = titleProps();
+    resetTitle({ name: "Level 1" });
+  }, []);
+
+  const { useLeft, useRight } = useArrows();
 
   return {
-    home,
-    View: useView({ name: initView }),
+    Left: useLeft,
+    Right: useRight,
+    Panel1: usePanel1,
+    Panel2: usePanel2,
+    Practice: usePractice,
+    onAnimationEnd: props?.onAnimationEnd,
+    className: useMemo(() => `${home} ${!isShown && hide}`, [isShown]),
   };
 }
 export function useAppStore() {
-  return {
-    Head,
-    Header: useHeader,
-    Footer: useFooter,
-    Wheel: useWheel,
-    ref,
-  };
+  const { useFooter, useHeader } = useLayout();
+  const { useWheel } = WheelProps();
+
+  return { Footer: useFooter, Header: useHeader, Wheel: useWheel, Head, ref };
 }
-export function useGStore() {
+export function useProps() {
   return {
-    unmount,
-    initIndex,
-    putIndex,
-    initView,
-    putView,
     ref,
+    initShown,
+    putShow,
+    initProps,
+    putProps,
+    unmount,
+    checkMounted,
+    findElement,
+    isAllUnfocused,
+    onAnimationEnd,
   };
 }

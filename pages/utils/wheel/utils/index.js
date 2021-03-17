@@ -1,87 +1,29 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { motion, useAnimation } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
-import { useGStore as GStore } from "../..";
-import { useTitleStore as TitleStore } from "../../header/utils/title/utils";
+import { useEffect, useMemo, useState } from "react";
+import { useProps as appProps } from "../..";
+import { useProps as titleProps } from "../../layout/header/utils/title/utils";
 import styles from "./style.module.scss";
-import { usePauseStore as PauseStore } from "../../footer/utils/pause/utils";
 
-let animate;
+let animation;
 let initDragged;
 let putDrag;
 let initResized;
 let putResize;
 let initFlipped;
 let putFlip;
-let initQuitted;
-let putQuit;
-let initAllFocused;
-let putFocusAll;
 let initProps;
 let putProps;
-let appWidth;
 
-export const GameOver = dynamic(() =>
-  import("./game-over").then((mod) => mod.useGameOver)
+const useWheel = dynamic(() => import("..").then((mod) => mod.useWheel));
+export const useContents = dynamic(() =>
+  import("./contents").then((mod) => mod.useContents)
 );
-export const Paused = dynamic(() =>
-  import("./paused").then((mod) => mod.usePaused)
-);
-
-export const defaultProps = {
+const defaultProps = {
   onDrag: null,
-  onFocusAll: null,
-  onGameStart: null,
-  onRestartLevel: null,
-  onContent: null,
+  onDragStart: null,
 };
-const { wheel, grab, flip: flipWheel } = styles;
-
-export function isWidth({ initWidth }) {
-  let width;
-  let height;
-
-  if (initWidth >= 367) {
-    width = 330;
-    height = 365;
-  } else {
-    width = "80%";
-    height = "50%";
-  }
-  return { width, height };
-}
-
-export const variants = {
-  normal: {
-    scale: 1,
-    boxShadow: "0px 8px 10px rgba(0, 0, 0, 0.2)",
-  },
-  resized: {
-    scale: 0.6,
-    boxShadow: "0px 4px 7px rgba(0, 0, 0, 0.2)",
-  },
-  unflipped: {
-    width: 66.4,
-    height: 72.8,
-    rotateX: 0,
-    rotateY: 0,
-    x: 0,
-    y: 0,
-  },
-  flipped() {
-    const { width, height } = isWidth({ initWidth: appWidth });
-
-    return {
-      x: 0,
-      y: -60,
-      width,
-      height,
-      rotateX: -180,
-      rotateY: -180,
-    };
-  },
-};
+const { wheel, grab, flipWheel } = styles;
 const transition = {
   type: "spring",
   duration: 0.6,
@@ -89,207 +31,220 @@ const transition = {
   damping: 9,
 };
 
-export function isView({ initView, initStarted }) {
-  if (initView !== "home" && !initStarted) {
-    return false;
+export function isWidth() {
+  const { ref } = appProps();
+  const appWidth = ref.current?.clientWidth;
+  const appHeight = ref.current?.clientHeight;
+
+  let width;
+  let height;
+  let y;
+
+  if (appWidth >= 367) {
+    width = 330;
+    height = 365;
+  } else {
+    width = "80%";
+    height = "50%";
   }
-  return true;
+  if (appWidth >= 380) {
+    y = -(appHeight / 2 - height / 2) / 2;
+  } else {
+    y = -40;
+  }
+  return { width, height, y };
+}
+
+function reset({ putIndex }) {
+  animation.start("unflipped");
+  setTimeout(animation.start.bind(null, "scaled"), 400);
+
+  if (putIndex) {
+    putIndex(0);
+  }
+  putFlip(false);
+}
+
+function onGameOver() {
+  animation.start("flipped");
+  putFlip(true);
+  putDrag(false);
+  putResize(false);
+}
+export function onFlip() {
+  const { width, height, y } = isWidth();
+
+  return {
+    scale: 1,
+    borderBottomRightRadius: "44%",
+    borderTopRightRadius: "44%",
+    borderTopLeftRadius: "44%",
+    x: 0,
+    y,
+    width,
+    height,
+    rotateX: -180,
+    rotateY: -180,
+  };
 }
 export function onDragStart() {
-  const { initView } = GStore();
-  const { initStarted } = TitleStore();
+  animation.start("resized");
+  putResize(true);
 
-  putResize(isView.bind(null, { initView, initStarted }));
-
-  initProps.onGameStart();
+  if (initProps.onDragStart) {
+    initProps.onDragStart();
+  }
 }
 export function onDragEnd() {
   putResize(false);
 }
-export function resizeWheel({ isResized }) {
-  if (isResized) {
-    animate.start("resized");
-  } else {
-    animate.start("normal");
+
+export function checkFlipped({ isFlipped }) {
+  if (!isFlipped) {
+    putDrag(true);
+    return;
+  }
+  const { putShow: showTitle } = titleProps();
+  showTitle(false);
+}
+export function checkWheel({ isResized, isDragged }) {
+  if (!isResized && isDragged) {
+    animation?.start("normal");
+    animation?.start("scaled");
+  }
+  if (!isDragged) {
+    animation?.start("normal");
   }
 }
-export function restartGame({ initName, showTitle }) {
-  if (initName !== "Practice") {
-    const { putMount: mountPause = () => {} } = PauseStore();
-    mountPause(true);
-    showTitle((old) => !old);
+
+function updateDragged({ isDragged, drag }) {
+  if (initDragged !== isDragged) {
+    initDragged = isDragged;
   }
-  const { putIndex = () => {} } = GStore();
-
-  putIndex(0);
-  initProps.onRestartLevel();
-  putFlip(false);
-  animate.start("unflipped");
-  putDrag(true);
-}
-export function isTitle(old) {
-  if (!old) {
-    return old;
-  }
-  return false;
-}
-export function quitGame() {
-  const { putShow: showPause = () => {} } = PauseStore();
-
-  const { putIndex = () => {} } = GStore();
-
-  putIndex(0);
-  showPause(false);
-  putQuit(true);
-  const { putShow: showTitle = () => {} } = TitleStore();
-
-  initProps.onRestartLevel();
-  showTitle(isTitle);
-  putFlip(false);
-  animate.start("unflipped");
-  putDrag(true);
-}
-export function isContent({ isFlipped, name }) {
-  if (isFlipped) {
-    if (name === "0:00" || name === "Practice") {
-      return <GameOver test="game-over" />;
-    }
-    return <Paused test="paused" />;
-  }
-  return null;
-}
-export function useContents({ name }) {
-  const content = isContent({ name, isFlipped: initFlipped });
-
-  return content;
-}
-export function updateDragged({ isDragged, drag }) {
-  initDragged = isDragged;
-  if (drag) {
+  if (drag && putDrag !== drag) {
     putDrag = drag;
   }
 }
-export function updateQuitted({ isQuitted, quit }) {
-  initQuitted = isQuitted;
-  if (quit) {
-    putQuit = quit;
+function updateResized({ isResized, resize }) {
+  if (initResized !== isResized) {
+    initResized = isResized;
   }
-}
-export function updateResized({ isResized, resize }) {
-  initResized = isResized;
-  if (resize) {
+  if (resize && putResize !== resize) {
     putResize = resize;
   }
 }
-export function updateFlipped({ isFlipped, flip }) {
-  initFlipped = isFlipped;
-  if (flip) {
+function updateFlipped({ isFlipped, flip }) {
+  if (initFlipped !== isFlipped) {
+    initFlipped = isFlipped;
+  }
+  if (flip && putFlip !== flip) {
     putFlip = flip;
   }
 }
-export function updateAllFocused({ isAllFocused, focusAll }) {
-  initAllFocused = isAllFocused;
-  if (focusAll) {
-    putFocusAll = focusAll;
+function updateProps({ props, setProps }) {
+  if (initProps !== props) {
+    initProps = props;
   }
-}
-export function updateProps({ props, setProps }) {
-  initProps = props;
-  if (setProps) {
+  if (setProps && putProps !== setProps) {
     putProps = setProps;
   }
 }
-export function onFlip({ isFlipped, onFocusAll }) {
-  if (!isFlipped) {
-    return;
-  }
-  if (onFocusAll) {
-    onFocusAll();
-  }
-}
-export function useClassName({ isResized, isFlipped }) {
-  return `${wheel} ${isResized && grab} ${isFlipped && flipWheel}`;
-}
 
 export function useStore() {
-  const { unmount, ref } = GStore();
-  animate = useAnimation();
-  appWidth = ref.current?.clientWidth;
-
-  const [isQuitted, quit] = useState(false);
-  updateQuitted({ isQuitted, quit });
-  useEffect(unmount.bind(null, { set: putQuit, value: false }), [unmount]);
-  useEffect(updateQuitted.bind(null, { isQuitted }), [isQuitted]);
+  const { ref, unmount } = appProps();
 
   const [isResized, resize] = useState(false);
   updateResized({ isResized, resize });
-  useEffect(unmount.bind(null, { set: resize, value: false }), [unmount]);
-  useEffect(updateResized.bind(null, { isResized }), [isResized]);
-  useEffect(resizeWheel.bind(null, { isResized }), [isResized]);
+  useEffect(() => unmount({ set: resize }), [unmount]);
+  useEffect(() => updateResized({ isResized }), [isResized]);
 
   const [isDragged, drag] = useState(true);
   updateDragged({ isDragged, drag });
-  useEffect(unmount.bind(null, { set: drag, value: true }), [unmount]);
-  useEffect(updateDragged.bind(null, { isDragged }), [isDragged]);
-
-  const [isFlipped, flip] = useState(false);
-  updateFlipped({ isFlipped, flip });
-  useEffect(unmount.bind(null, { set: putFlip, value: false }), [unmount]);
-  useEffect(updateFlipped.bind(null, { isFlipped }), [isFlipped]);
-
-  const [isAllFocused, focusAll] = useState(false);
-  updateAllFocused({ isAllFocused, focusAll });
-  useEffect(unmount.bind(null, { set: putFocusAll, value: false }), [unmount]);
-  useEffect(updateAllFocused.bind(null, { isAllFocused }), [isAllFocused]);
+  useEffect(() => unmount({ set: drag }), [unmount]);
+  useEffect(() => updateDragged({ isDragged }), [isDragged]);
 
   const [props, setProps] = useState(defaultProps);
   updateProps({ props, setProps });
-  useEffect(unmount.bind(null, { set: putProps, value: defaultProps }), [
-    unmount,
-  ]);
-  useEffect(updateProps.bind(null, { props }), [props]);
+  useEffect(() => unmount({ set: setProps }), [unmount]);
+  useEffect(() => updateProps({ props }), [props]);
 
-  useEffect(onFlip.bind(null, { isFlipped, onFocusAll: props.onFocusAll }), [
-    isFlipped,
-    props.onFocusAll,
-  ]);
+  const [isFlipped, flip] = useState(false);
+  updateFlipped({ isFlipped, flip });
+  useEffect(() => unmount({ set: flip }), [unmount]);
+  useEffect(() => updateFlipped({ isFlipped }), [isFlipped]);
 
-  const { initName } = TitleStore();
+  useEffect(() => checkWheel({ isDragged, isResized }), [isResized, isDragged]);
+
+  useEffect(() => checkFlipped({ isFlipped }), [isFlipped]);
+
+  animation = useAnimation();
 
   return {
-    initName,
-    transition,
-    Contents: useContents,
     ref,
-    isDragged: initDragged,
-    animate,
-    className: useMemo(useClassName.bind(null, { isFlipped, isResized }), [
-      isFlipped,
-      isResized,
-    ]),
-    variants,
     motion,
+    animation,
+    transition,
+    isFlipped,
+    isDragged,
+    Contents: useContents,
+    onDrag: props?.onDrag,
     onDragStart,
-    onDrag: initProps.onDrag,
     onDragEnd,
+    className: useMemo(
+      () => `${wheel} ${isResized && grab} ${isFlipped && flipWheel}`,
+      [isResized, isFlipped]
+    ),
+    variants: useMemo(
+      () => ({
+        normal: {
+          scale: 1,
+          boxShadow: "0px 8px 10px rgba(0, 0, 0, 0.2)",
+          borderBottomRightRadius: "44%",
+          borderTopRightRadius: "44%",
+          borderTopLeftRadius: "44%",
+        },
+        resized: {
+          scale: 0.5,
+          boxShadow: "0px 4px 7px rgba(0, 0, 0, 0.2)",
+          borderBottomRightRadius: "50%",
+          borderTopRightRadius: "50%",
+          borderTopLeftRadius: "50%",
+        },
+        unflipped: {
+          width: 66.4,
+          height: 72.8,
+          rotateX: 0,
+          rotateY: 0,
+          x: 0,
+          y: 0,
+        },
+        flipped: onFlip,
+        scaled: {
+          scale: 0.8,
+          transition: {
+            duration: 0.7,
+            repeatType: "mirror",
+            repeat: Infinity,
+          },
+        },
+      }),
+      []
+    ),
   };
 }
-export function useWheelStore() {
+export function useProps() {
   return {
-    initAllFocused,
-    putFocusAll,
-    initProps,
-    putProps,
-    initResized,
-    putResize,
-    animate,
-    initDragged,
-    putDrag,
+    useWheel,
+    animation,
     initFlipped,
     putFlip,
-    initQuitted,
-    putQuit,
-    restartGame,
-    quitGame,
+    initResized,
+    putResize,
+    initProps,
+    putProps,
+    initDragged,
+    putDrag,
+    reset,
+    onGameOver,
   };
 }

@@ -5,9 +5,7 @@
   z-index: 101;
   position: absolute;
   bottom: 10%;
-  border-top-right-radius: 44%;
-  border-top-left-radius: 44%;
-  border-bottom-right-radius: 44%;
+  border-radius: 44% 44% 44% 0;
   width: 66.4px;
   height: 72.8px;
   background: $painted-desert;
@@ -22,5 +20,6 @@
   }
   &.flip {
     cursor: unset;
+    transform: translateZ(-1px);
   }
 }

@@ -1,0 +1,4 @@
+.left {
+  @import "../../tools/styles";
+  @include nav-styles("<", left);
+}

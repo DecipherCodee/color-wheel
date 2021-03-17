@@ -1,23 +1,16 @@
 import { shallow } from "enzyme";
 import { App } from "../../_document.page";
 
-describe("_document.page.jsx", () => {
-  it("should render", () => {
+describe("document", () => {
+  it("renders", () => {
     const wrapper = shallow(<App />);
-    expect(wrapper).toHaveLength(1);
+    expect(wrapper.isEmptyRender()).toBeFalsy();
   });
 
   describe("getInitialProps", () => {
-    const ctx = {
-      renderPage() {
-        return jest.fn;
-      },
-    };
-
     test("returns an object", async () => {
+      const ctx = { renderPage: jest.fn };
       const result = await App.getInitialProps(ctx);
-
-      expect(typeof result === "object").toBeTruthy();
       expect(result).toEqual({ html: undefined, head: undefined, styles: [] });
     });
   });

@@ -1,12 +1,13 @@
 import { shallow } from "enzyme";
 import { useWheel } from "../..";
+import { useProps } from "..";
 
-describe("wheel", () => {
-  it("renders", () => {
-    function Wheel() {
-      return useWheel();
-    }
+describe("useWheel", () => {
+  it("renders with Contents", () => {
+    const Wheel = useWheel;
     const wrapper = shallow(<Wheel />);
-    expect(wrapper).toHaveLength(1);
+    const { putFlip } = useProps();
+    putFlip(true);
+    expect(wrapper.isEmptyRender()).toBeFalsy();
   });
 });
